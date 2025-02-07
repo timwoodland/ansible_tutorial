@@ -2,10 +2,11 @@
 - hosts: all
   become: true
   tasks:
-    - name: remove apache2 and php packages
+    - name: remove apache2, php packages, mariadb
       apt:
         name:
           - apache2
           - libapache2-mod-php
+          - mariadb-server
         state: absent
       when: ansible_distribution == "Debian"
