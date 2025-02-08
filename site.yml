@@ -9,17 +9,26 @@
         update_cache: yes
       when: ansible_distribution == "Debian"
 
-- hosts: pi_servers
+- hosts: pi_web_servers
   become: true
   tasks:
     - name: install apache and php packages for Debian
-      tags: pi_servers,apache,debian
+      tags: pi_web_servers,apache,debian
       apt:
         name:
           - apache2
           - libapache2-mod-php
         state: latest
       when: ansible_distribution == "Debian"
+
+    - name: copy default html file for site
+      tags: pi_web_servers,apache,debian
+      copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0644
 
 - hosts: pi_db_servers
   become: true

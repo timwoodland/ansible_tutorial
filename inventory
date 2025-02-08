@@ -1,4 +1,4 @@
-[pi_servers]
+[pi_web_servers]
 tim@192.168.10.173
 
 [pi_db_servers]
