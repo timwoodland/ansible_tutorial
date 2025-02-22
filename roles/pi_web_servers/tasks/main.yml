@@ -1,0 +1,41 @@
+- name: install apache and php packages for Debian
+  tags: pi_web_servers,apache,debian
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "Debian"
+
+- name: start apache2, if not started
+  tags: pi_web_servers,apache,debian
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Debian"
+
+- name: change email address for admin
+  tags: pi_web_servers,apache,debian
+  lineinfile:
+    path: /etc/apache2/sites-available/000-default.conf
+    regex: "ServerAdmin"
+    line: "\tServerAdmin pi@localhost"
+  when: ansible_distribution == "Debian"
+  register: apache2_admin_email
+
+- name: restart apache2, when apache2_admin_email changed
+  tags: pi_web_servers,apache,debian
+  service:
+    name: apache2
+    state: restarted
+  when: apache2_admin_email.changed
+
+- name: copy default html file for site
+  tags: pi_web_servers,apache,debian
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
