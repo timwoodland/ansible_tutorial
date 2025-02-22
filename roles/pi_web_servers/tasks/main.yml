@@ -2,15 +2,15 @@
   tags: pi_web_servers,apache,debian
   apt:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
   when: ansible_distribution == "Debian"
 
 - name: start apache2, if not started
   tags: pi_web_servers,apache,debian
   service:
-    name: apache2
+    name: "{{ apache_service }}"
     state: started
     enabled: yes
   when: ansible_distribution == "Debian"
@@ -20,16 +20,17 @@
   lineinfile:
     path: /etc/apache2/sites-available/000-default.conf
     regex: "ServerAdmin"
-    line: "\tServerAdmin pi@localhost"
+    line: "\tServerAdmin pi@localhost.net"
   when: ansible_distribution == "Debian"
-  register: apache2_admin_email
+  notify: restart_apache
 
-- name: restart apache2, when apache2_admin_email changed
-  tags: pi_web_servers,apache,debian
-  service:
-    name: apache2
-    state: restarted
-  when: apache2_admin_email.changed
+# removed as we are now using "notify"
+# - name: restart apache2, when apache2_admin_email changed
+#   tags: pi_web_servers,apache,debian
+#   service:
+#     name: "{{ apache_service }}"
+#     state: restarted
+#   when: apache2_admin_email.changed
 
 - name: copy default html file for site
   tags: pi_web_servers,apache,debian
